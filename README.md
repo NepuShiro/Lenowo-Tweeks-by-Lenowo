@@ -13,6 +13,9 @@ A [ResoniteModLoader](https://github.com/resonite-modding-group/ResoniteModLoade
 8. Fixed a few annoying things with protoflux such as a toggle for physical touch, makeing dynvar inputs and similar fields auto load their text editors.
 9. Modified component headers for dynamic variables to include the variable name AND its customizable with what wording you like!
 
+
+Also the source code for this mod isn't public as we have a private version of this mod with security features for our avatars and other things specific to Lenowo that shouldn't be public thats all, Enjoy the mod!
+
 ## Installation
 1. Install [ResoniteModLoader](https://github.com/resonite-modding-group/ResoniteModLoader).
 1. Place [LenowoTweeks.dll](https://github.com/YourGithubUsername/YourModRepoName/releases/latest/download/LenowoTweeks.dll) into your `rml_mods` folder. This folder should be at `C:\Program Files (x86)\Steam\steamapps\common\Resonite\rml_mods` for a default install. You can create it if it's missing, or if you launch the game once with ResoniteModLoader installed it will create this folder for you.

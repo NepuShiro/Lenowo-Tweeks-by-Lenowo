@@ -19,7 +19,7 @@ The source code itself isn't public, but a decompiled version is provided.
 > The decompiled code uses ILSpy, so it isn't perfectly accurate to source.
 
 
-- The source code for this mod isn't public as we have a private version of this mod with security features for our avatars and other things specific to Lenowo that shouldn't be public.
+> The source code for this mod isn't public as we have a private version of this mod with security features for our avatars and other things specific to Lenowo that shouldn't be public.
 
 ### Enjoy the mod!
 

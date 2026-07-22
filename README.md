@@ -13,17 +13,13 @@ A [ResoniteModLoader](https://github.com/resonite-modding-group/ResoniteModLoade
 8. Fixed a few annoying things with protoflux such as a toggle for physical touch, makeing dynvar inputs and similar fields auto load their text editors.
 9. Modified component headers for dynamic variables to include the variable name AND its customizable with what wording you like!
 
-
-The source code itself isn't public, but a decompiled version is provided.
-
-> The decompiled code uses ILSpy, so it isn't perfectly accurate to source.
-
-
-> The source code for this mod isn't public as we have a private version of this mod with security features for our avatars and other things specific to Lenowo that shouldn't be public.
+\
+This repository contains multiple 'sub-mods', which the mod considers as 'modules'.\
+When it comes to using the mod, you ***must*** have `LenowoTweeks.Core` installed, along with any other module you want
 
 ### Enjoy the mod!
 
 ## Installation
 1. Install [ResoniteModLoader](https://github.com/resonite-modding-group/ResoniteModLoader).
-1. Place [LenowoTweeks.dll](https://github.com/bobjbo/Lenowo-Tweeks-by-Lenowo/releases/latest/download/LenowoTweeks.dll) into your `rml_mods` folder. This folder should be at `C:\Program Files (x86)\Steam\steamapps\common\Resonite\rml_mods` for a default install. You can create it if it's missing, or if you launch the game once with ResoniteModLoader installed it will create this folder for you.
-1. Start the game. If you want to verify that the mod is working you can check your Resonite logs.
+1. Download and Extract [LenowoTweeks.All.zip](https://github.com/bobjbo/Lenowo-Tweeks-by-Lenowo/releases/latest/download/LenowoTweeks.All.zip) into your `rml_mods` folder. This folder should be at `C:\Program Files (x86)\Steam\steamapps\common\Resonite\rml_mods` for a default install. You can create it if it's missing, or if you launch the game once with ResoniteModLoader installed it will create this folder for you.
+1. Start the game. If the mods have loaded properly, you should be able to find and edit the config through [ResoniteModSettings](https://github.com/badhaloninja/ResoniteModSettings) or [RMLModSettings](https://github.com/NepuShiro/RMLModSettings) (For BepisLoader)

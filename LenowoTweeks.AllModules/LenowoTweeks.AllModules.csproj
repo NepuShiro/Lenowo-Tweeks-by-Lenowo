@@ -1,0 +1,26 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+	<PropertyGroup>
+		<GenerateAssemblyInfo>false</GenerateAssemblyInfo>
+		<TargetFramework>net10.0</TargetFramework>
+		<LangVersion>14.0</LangVersion>
+	</PropertyGroup>
+
+	<ItemGroup>
+		<ProjectReference Include="../LenowoTweeks.Core/LenowoTweeks.Core.csproj" />
+		<ProjectReference Include="../LenowoTweeks.General/LenowoTweeks.General.csproj" />
+		<ProjectReference Include="../LenowoTweeks.Inspectors/LenowoTweeks.Inspectors.csproj" />
+		<ProjectReference Include="../LenowoTweeks.ProtoFlux/LenowoTweeks.ProtoFlux.csproj" />
+	</ItemGroup>
+
+	<Target Name="PostBuild" AfterTargets="PostBuildEvent" Condition="'$(Configuration)'=='Release'">
+		<Delete Files="$(OutputPath)LenowoTweeks.AllModules.dll" />
+		<ItemGroup>
+			<InputFiles Include="$(OutputPath)/LenowoTweeks.*.dll" />
+		</ItemGroup>
+		<Delete Files="$(OutputPath)LenowoTweeks.All.zip" />
+		<RemoveDir Directories="$(OutputPath)Files" />
+		<MakeDir Directories="$(OutputPath)Files" />
+		<Copy SourceFiles="@(InputFiles)" DestinationFolder="$(OutputPath)Files" ContinueOnError="true" Retries="0" />
+		<ZipDirectory DestinationFile="$(OutputPath)LenowoTweeks.All.zip" SourceDirectory="$(OutputPath)/Files" />
+	</Target>
+</Project>

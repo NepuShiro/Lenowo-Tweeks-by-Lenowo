@@ -57,7 +57,7 @@ public class LenowoTweeks_ConfigUpdater : ResoniteMod
 			JToken value = item.Value;
 
 			// replace '_abc' with ' Abc' / 'abc_def' with 'abc Def'
-			string fixedName = Regex.Replace(name, "/_([a-z])/gm", (m) => $" {m.Captures[1].Value.ToUpperInvariant()}");
+			string fixedName = Regex.Replace(name, "/_([a-z])/gm", (m) => $" {m.Captures[0].Value.ToUpperInvariant()}");
 			// replace 'abcDef' with 'abc Def'
 			fixedName = Regex.Replace(fixedName, "/([a-z])([A-Z])/gm", (m) => $"{m.Captures[0]} ${m.Captures[1]}");
 			// catch any loose underscores

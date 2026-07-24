@@ -56,16 +56,33 @@ public class LenowoTweeks_ConfigUpdater : ResoniteMod
 			string name = item.Key;
 			JToken value = item.Value;
 
-			// replace '_abc' with ' Abc' / 'abc_def' with 'abc Def'
-			string fixedName = Regex.Replace(name, "/_([a-z])/gm", (m) => $" {m.Captures[0].Value.ToUpperInvariant()}");
-			// replace 'abcDef' with 'abc Def'
-			fixedName = Regex.Replace(fixedName, "/([a-z])([A-Z])/gm", (m) => $"{m.Captures[0]} ${m.Captures[1]}");
-			// catch any loose underscores
+			string fixedName = name;
+			// replace underscores with a space
 			fixedName = fixedName.Replace("_", " ");
+			// i do not trust the regex
+			try
+			{
+				// replace ' abc' with ' Abc' / 'abc def' with 'abc Def'
+				fixedName = Regex.Replace(fixedName, "/ ([a-z])/gm", (m) => $" {m.Captures[0].Value.ToUpper()}");
+			}
+			catch
+			{
+				// should hopefully make the config updater not complain as much?
+			}
+			// do it again
+			try
+			{	
+				// replace 'abcDef' with 'abc Def'
+				fixedName = Regex.Replace(fixedName, "/([a-z])([A-Z])/gm", (m) => $"{m.Captures[0]} ${m.Captures[1]}");
+			}
+			catch
+			{
+				// this is a horrible solution but until i can actually figure out the bug, this should be fine
+			}
 			// replace 'ui' with 'UI' and 'uix' with 'UIX'
 			fixedName = fixedName.Replace("uix", "UIX").Replace("ui", "UI");
 			// make first character uppercase
-			fixedName = fixedName[..0].ToUpperInvariant() + fixedName[1..];
+			fixedName = fixedName[0].ToString().ToUpper() + fixedName[1..];
 
 			switch (name)
 			{

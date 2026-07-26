@@ -40,6 +40,11 @@ public class GenerateElement_Patches
 			staticTexture2D.FilterMode.Value = LenowoTweeks_ProtoFlux.wireTextureFilterMode.Value;
 			staticTexture2D.MipMaps.Value = false;
 			Helpers.SetConfigReference<IAssetProvider<ITexture2D>>(root.LocalUser, textureName, staticTexture2D, connectorAssets);
+			spriteTexture = staticTexture2D;
+
+			SpriteProvider spriteProvider = connectorAssets.AttachComponent<SpriteProvider>();
+			spriteProvider.Texture.Target = staticTexture2D;
+			Helpers.SetConfigReference<SpriteProvider>(root.LocalUser, textureName.Replace("Texture", "Sprite"), spriteProvider, connectorAssets);
 		}
 	}
 
@@ -62,10 +67,17 @@ public class GenerateElement_Patches
 		if (runningUser.IsLocalUser)
 		{
 			Helpers.SetConfigVariable(image.LocalUser, "Protoflux.ConnectorColor", LenowoTweeks_ProtoFlux.connectorTextureColor.Value, ConnectorStuff);
+			Helpers.SetConfigVariable(image.LocalUser, "Protoflux.FlippedConnectors", LenowoTweeks_ProtoFlux.wireConnectorFlipUV.Value, ConnectorStuff);
+
+			Uri ConnectorURI = LenowoTweeks_ProtoFlux.customProtofluxConnectorUIX.Value;
+			Uri ConnectorURI2 = LenowoTweeks_ProtoFlux.customProtofluxEmptyConnectorUIX.Value ?? LenowoTweeks_ProtoFlux.customProtofluxConnectorUIX.Value;
+			GetOrCreateTexture(image.Slot, ConnectorURI, false);
+			GetOrCreateTexture(image.Slot, ConnectorURI2, true);
 		}
 		Helpers.DriveFromVariable(runningUser, "Protoflux.ConnectorColor", UnlitMat.Tint, ConnectorStuff);
 
-		image.Material.Target = UnlitMat;
+		image.Material.Target = null;
+		image.Sprite.Target = null;
 
 		int type = 4;
 		if (elementType != null)
@@ -73,12 +85,42 @@ public class GenerateElement_Patches
 			type = typeof(IVector).IsAssignableFrom(elementType) ? (elementType.GetVectorDimensions() - 1) : 0;
 		}
 
-		Slot spriteAssetSlot = ConnectorStuff.FindChildOrAdd("Sprites");
+		Slot spriteAssetSlot = ConnectorStuff.FindChildOrAdd("Connector Assets");
+
+		image.Slot.AttachComponent<Mask>();
+		Slot imageSlot = image.Slot.AddSlot("Connector Image");
+		imageSlot.AttachComponent<RectTransform>();
+		var img = imageSlot.AttachComponent<Image>();
+		img.Material.Target = UnlitMat;
+		img.Tint.Value = image.Tint.Value;
 
 		var brd = image.Slot.AttachComponent<BooleanReferenceDriver<IAssetProvider<Sprite>>>();
 
-		var e1 = Helpers.GetConfigReferenceSource<SpriteProvider>(runningUser, $"Connector.Sprite.Normal-{type}-{output}", spriteAssetSlot);
-		var e2 = Helpers.GetConfigReferenceSource<SpriteProvider>(runningUser, $"Connector.Sprite.Alt-{type}-{output}", spriteAssetSlot);
+		var e1 = Helpers.GetConfigReferenceSource<SpriteProvider>(runningUser, $"Connector.Sprite.Normal", spriteAssetSlot);
+		var e2 = Helpers.GetConfigReferenceSource<SpriteProvider>(runningUser, $"Connector.Sprite.Alt", spriteAssetSlot);
+
+		if (e1.Target == null)
+		{
+			var t1 = Helpers.GetConfigReference<IAssetProvider<ITexture2D>>(runningUser, "Connector.Texture.Normal");
+			if (t1 != null)
+			{
+				var newSprite = spriteAssetSlot.AttachComponent<SpriteProvider>();
+				newSprite.Texture.Target = t1;
+				e1.Target = newSprite;
+				Helpers.SetConfigReference<SpriteProvider>(runningUser, "Connector.Sprite.Normal", newSprite, spriteAssetSlot);
+			}
+		}
+		if (e2.Target == null)
+		{
+			var t2 = Helpers.GetConfigReference<IAssetProvider<ITexture2D>>(runningUser, "Connector.Texture.Alt");
+			if (t2 != null)
+			{
+				var newSprite = spriteAssetSlot.AttachComponent<SpriteProvider>();
+				newSprite.Texture.Target = t2;
+				e2.Target = newSprite;
+				Helpers.SetConfigReference<SpriteProvider>(runningUser, "Connector.Sprite.Alt", newSprite, spriteAssetSlot);
+			}
+		}
 
 		e1.Target ??= ConnectorStuff.FindChild($"Connector_{type}_{output}_False")?.GetComponent<SpriteProvider>() ?? null;
 		e2.Target ??= ConnectorStuff.FindChild($"Connector_{type}_{output}_True")?.GetComponent<SpriteProvider>() ?? null;
@@ -86,70 +128,13 @@ public class GenerateElement_Patches
 		brd.TrueTarget.Target = e1.Target;
 		brd.FalseTarget.Target = e2.Target;
 
-		brd.TargetReference.Target = image.Sprite;
+		brd.TargetReference.Target = img.Sprite;
 		var tsdSource = Helpers.GetTimeSineDriverSource(runningUser);
 
-		if (runningUser.IsLocalUser)
-		{
-			float4 borders = new(0.5f);
-			bool flippedCalc = LenowoTweeks_ProtoFlux.wireConnectorFlipUV.Value ? !output : output;
-			Rect rect = new(flippedCalc ? 0.5f : 0f, 0.2f * (4 - type), 1f, 0.2f);
+		bool flippedCalc = Helpers.GetConfigVariable(runningUser, "Protoflux.FlippedConnectors", false) ? !output : output;
+		Rect rect = new(flippedCalc ? -1f : 0f, -(4 - type), 2f, 5f);
 
-			Uri ConnectorURI = LenowoTweeks_ProtoFlux.customProtofluxConnectorUIX.Value;
-			Uri ConnectorURI2 = LenowoTweeks_ProtoFlux.customProtofluxEmptyConnectorUIX.Value ?? LenowoTweeks_ProtoFlux.customProtofluxConnectorUIX.Value;
-			GetOrCreateTexture(image.Slot, ConnectorURI, false);
-			GetOrCreateTexture(image.Slot, ConnectorURI2, true);
-
-			var tex1 = Helpers.GetConfigReference<IAssetProvider<ITexture2D>>(runningUser, "Connector.Texture.Normal");
-			var tex2 = Helpers.GetConfigReference<IAssetProvider<ITexture2D>>(runningUser, "Connector.Texture.Alt");
-
-			var multiDriverNormal = spriteAssetSlot.GetComponent<ReferenceMultiDriver<IAssetProvider<ITexture2D>>>(v => v.UpdateOrder == 0);
-			multiDriverNormal ??= spriteAssetSlot.AttachComponent<ReferenceMultiDriver<IAssetProvider<ITexture2D>>>();
-
-			var multiDriverAlt = spriteAssetSlot.GetComponent<ReferenceMultiDriver<IAssetProvider<ITexture2D>>>(v => v.UpdateOrder == 1);
-			if (multiDriverAlt == null)
-			{
-				multiDriverAlt = spriteAssetSlot.AttachComponent<ReferenceMultiDriver<IAssetProvider<ITexture2D>>>();
-				multiDriverAlt.UpdateOrder = 1;
-			}
-
-			Helpers.DriveFromReference<IAssetProvider<ITexture2D>>(runningUser, "Connector.Texture.Normal", multiDriverNormal.Reference);
-			Helpers.DriveFromReference<IAssetProvider<ITexture2D>>(runningUser, "Connector.Texture.Alt", multiDriverAlt.Reference);
-
-			if (e1.Target == null)
-			{
-				if (tex1 != null)
-				{
-					SpriteProvider newSpriteProvider = spriteAssetSlot.AttachComponent<SpriteProvider>();
-					newSpriteProvider.Rect.Value = rect;
-					newSpriteProvider.Borders.Value = borders;
-
-					var newItem = multiDriverNormal.Drives.Add();
-					newItem.Target = newSpriteProvider.Texture;
-
-					brd.TrueTarget.Target = newSpriteProvider;
-
-					e1.Target = newSpriteProvider;
-				}
-			}
-			if (e2.Target == null)
-			{
-				if (tex2 != null)
-				{
-					SpriteProvider newSpriteProvider2 = spriteAssetSlot.AttachComponent<SpriteProvider>();
-					newSpriteProvider2.Rect.Value = rect;
-					newSpriteProvider2.Borders.Value = borders;
-
-					var newItem = multiDriverAlt.Drives.Add();
-					newItem.Target = newSpriteProvider2.Texture;
-
-					brd.FalseTarget.Target = newSpriteProvider2;
-
-					e2.Target = newSpriteProvider2;
-				}
-			}
-		}
-
+		img.FillRect.Value = rect;
 
 		if (targetConnection is ISyncRef nodeInput)
 		{

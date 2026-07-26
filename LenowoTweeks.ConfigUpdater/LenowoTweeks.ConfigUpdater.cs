@@ -18,7 +18,7 @@ namespace LenowoTweeks.ConfigUpdater;
 
 public class LenowoTweeks_ConfigUpdater : ResoniteMod
 {
-	internal const string VERSION_CONSTANT = "2.0.0";
+	internal const string VERSION_CONSTANT = "2.0.3";
 	const string ModName = "Lenowo Tweeks (Config Updater)";
 	public override string Name => ModName;
 	public override string Author => "Rosa";

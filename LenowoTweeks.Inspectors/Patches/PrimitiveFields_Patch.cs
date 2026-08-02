@@ -631,14 +631,15 @@ public class PrimitiveFields_Patch
 			parent1.OrderOffset = 1;
 			parent2.OrderOffset = 2;
 
-			UIBuilder ui = new UIBuilder(Texts.Parent);
-			RadiantUI_Constants.SetupEditorStyle(ui);
-			ui.Style.MinHeight = 28f;
-			TextField field = ui.TextField("", false, null!, true, "<alpha=#88><i>Search blendshapes</closeall>");
+			Slot root = Texts.Parent.AddSlot("BlendshapeSearch");
+			ValueField<string> field = root.AttachComponent<ValueField<string>>();
+			SyncMemberEditorBuilder.BuildField(field.Value, field.GetSyncMemberFieldInfo("Value"), root, null!);
+			TextEditor tEditor = root.GetComponentInChildren<TextEditor>();
+			tEditor?.FinishHandling.Value = TextEditor.FinishAction.NullOnWhitespace;
+			(tEditor?.Text.Target as Text)?.NullContent.Value = "<alpha=#88><i>Search blendshapes</closeall>";
+
 			field.Slot.ActiveSelf_Field.DriveFrom(VL.ActiveSelf_Field);
-			field.Text.Content.Value = null!;
-			field.Editor.Target.FinishHandling.Value = TextEditor.FinishAction.NullOnWhitespace;
-			field.Text.Content.OnValueChange += delegate(SyncField<string> content)
+			field.Value.OnValueChange += content =>
 			{
 				SkinnedMeshRenderer? meshRenderer;
 				if (editor.GetSyncMember("_targetList") is SyncRef<ISyncList> iList && iList.Target is { } list) //editor("_targetList")?.Target != null)
